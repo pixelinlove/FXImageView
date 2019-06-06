@@ -671,6 +671,8 @@
 #pragma mark -
 #pragma mark Thread Save Operations
 
+#define FXIMAGEVIEW_ISTHREADSAVE 1
+
 - (CGSize)threadSaveBoundsSize
 {
 	__block CGSize boundsSize;
