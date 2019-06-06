@@ -204,7 +204,7 @@
     
     return [NSString stringWithFormat:@"%@_%@_%.2f_%.2f_%.2f_%@_%@_%.2f_%.2f_%@",
             _imageContentURL ?: [self imageHash:_originalImage],
-            NSStringFromCGSize(self.bounds.size),
+            NSStringFromCGSize([self threadSaveBoundsSize]),
             _reflectionGap,
             _reflectionScale,
             _reflectionAlpha,
@@ -265,7 +265,7 @@
     NSString *cacheKey = [self cacheKey];
     UIImage *image = _originalImage;
     NSURL *imageURL = _imageContentURL;
-    CGSize size = self.bounds.size;
+    CGSize size = [self threadSaveBoundsSize];
     CGFloat reflectionGap = _reflectionGap;
     CGFloat reflectionScale = _reflectionScale;
     CGFloat reflectionAlpha = _reflectionAlpha;
@@ -666,6 +666,22 @@
         self.imageContentURL = URL;
         [self updateProcessedImage];
     }
+}
+
+#pragma mark -
+#pragma mark Thread Save Operations
+
+- (CGSize)threadSaveBoundsSize
+{
+	__block CGSize boundsSize;
+	if ([NSThread isMainThread]) {
+		boundsSize = self.bounds.size;
+	} else {
+		dispatch_sync(dispatch_get_main_queue(), ^{
+			boundsSize = self.bounds.size;
+		});
+	}
+	return boundsSize;
 }
 
 @end
